@@ -14,8 +14,8 @@ const params = new URLSearchParams(productId);
 const idNumber = params.get("Id");
 var selectedQty = null;
 var selectedColor = null;
-var $cartItems = [];
-var $cart = [];
+var cartItems = [];
+var cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 class shoppingCart {
   constructor(id, color, quantity) {
@@ -25,13 +25,11 @@ class shoppingCart {
   }
 }
 
-// fetch API
 const retrieveData = () =>
   fetch(`http://localhost:3000/api/products`)
     .then((res) => res.json())
     .catch((err) => console.log("Oh no", err));
 
-// Fill Product Data
 const fillProductData = (product) => {
   $itemName.textContent = product.name;
   $itemPrice.textContent = product.price;
@@ -52,7 +50,8 @@ const fillProductData = (product) => {
   }
 };
 
-// Vérifie les champs
+// Check Inputs
+
 const checkColorSelected = () => {
   selectedColor =
     $itemColorPicker.options[$itemColorPicker.selectedIndex].value;
@@ -78,42 +77,38 @@ const checkQty = () => {
 
 const isCartValid = () => checkColorSelected() && checkQty();
 
-const cartClick = () => {
+// On click
+
+const handleCartBtn = () => {
   if (isCartValid()) {
-    // On store à partir de maintenant les données
-    const $itemInCart = new shoppingCart(idNumber, selectedColor, selectedQty);
-    // on doit check si id est dejà là
-      // si oui: on check si couleur est dejà là
-        // si oui: somme quantité
-        // si non: push
-      // si non: push
-    for (let i = 0; i < $cart.length; i++) {
-      if ($cart[i]) {
-        if ($cart[i].id === idNumber) {
-          if ($cart[i].color === selectedColor) {
-            console.log('oui')
-            // const sameItem = $cart.filter(i => i.id === idNumber && i.color === selectedColor)
-            console.log(sameItem)
-          } else {
-            $cartItems.push($itemInCart);
-            localStorage.setItem("cart", JSON.stringify($cartItems));
-          }
-        } else {
-          $cartItems.push($itemInCart);
-          localStorage.setItem("cart", JSON.stringify($cartItems));
+    const itemInCart = new shoppingCart(idNumber, selectedColor, selectedQty);
+
+    if (cart.length > 0) {
+      let isItemAlreadyInCart = false;
+      for (let i = 0; i < cart.length; i++) {
+        if (cart[i].id === idNumber && cart[i].color === selectedColor) {
+          cart[i].quantity = Number(cart[i].quantity) + Number(selectedQty);
+          isItemAlreadyInCart = true;
         }
       }
+      if (!isItemAlreadyInCart) {
+        addToCart(itemInCart);
+      }
+      localStorage.setItem("cart", JSON.stringify(cart));
+    } else {
+      addToCart(itemInCart);
     }
-    
-    var $cart = JSON.parse(localStorage.getItem('cart'));
-
     alert("Article ajouté au panier !");
   } else {
-      console.error("Erreur inattendue")
+    console.error("Erreur inattendue");
   }
 };
 
-// execute
+const addToCart = (item) => {
+  cart.push(item);
+  localStorage.setItem("cart", JSON.stringify(cart));
+};
+
 const main = async () => {
   const productData = await retrieveData();
 
@@ -125,4 +120,3 @@ const main = async () => {
 };
 
 main();
-
