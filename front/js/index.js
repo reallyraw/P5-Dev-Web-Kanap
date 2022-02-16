@@ -2,7 +2,6 @@ const $kanapItems = document.querySelector('.items')
 
 // Img
 
-
 const createItemCardImg = Item => {
     const $ItemImg = document.createElement('img')
 
@@ -15,7 +14,6 @@ const createItemCardImg = Item => {
 }
 
 // Info
-
 
 const createItemCardInfo = item => {
     const $itemInfo = document.createElement('article')
@@ -39,8 +37,6 @@ const createItemCardInfo = item => {
 
     return $itemInfo
 }
-
-
 
 // Card
 
@@ -81,15 +77,13 @@ const createItem = item => {
     return $item
 }
 
-
-// récupérer les données de l'API
+// fetch API
 
 const retrieveData = () => fetch(`http://localhost:3000/api/products`)
     .then(res => res.json())
-    .catch(err => console.log("Oh no", err))
+    .catch(err => console.error("Oh no", err))
 
-
-// Finalisation
+// Finalize
 
 const main = async () => {
     const kanapData = await retrieveData()
